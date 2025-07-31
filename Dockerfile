@@ -2,16 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-#files
-COPY app/ ./app/
-COPY .env ./
-COPY requirements.txt ./
-
-#dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-#port
+COPY app/ ./app/
+COPY .env .  # Only if your app depends on it at runtime
+
 EXPOSE 8080
 
-#Flask app
+ENV FLASK_APP=app/app.py
+ENV FLASK_RUN_PORT=8080
+
 CMD ["python", "app/app.py"]
