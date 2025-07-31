@@ -1,25 +1,41 @@
-from flask import Flask, render_template, request, jsonify
-import requests
 import os
+import requests
+from flask import Flask, request, jsonify
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-API_KEY = os.getenv("GEOAPIFY_API_KEY")
+GEOAPIFY_API_KEY = os.getenv("GEOAPIFY_API_KEY")
+print(f"Loaded GEOAPIFY_API_KEY: {GEOAPIFY_API_KEY}")
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def home():
+    return 'Welcome to MediFinder! Use /find-hospitals?lat=...&lon=...'
 
-@app.route('/search', methods=['POST'])
-def search():
-    data = request.json
-    lat = data['lat']
-    lon = data['lon']
-    category = data['category']
-    
-    url = f"https://api.geoapify.com/v2/places?categories={category}&filter=circle:{lon},{lat},10000&bias=proximity:{lon},{lat}&limit=10&apiKey={API_KEY}"
-    response = requests.get(url)
-    
-    return jsonify(response.json())
+@app.route('/find-hospitals')
+def find_hospitals():
+    lat = request.args.get('lat')
+    lon = request.args.get('lon')
+
+    if not lat or not lon:
+        return jsonify({"error": "Please provide both 'lat' and 'lon' in the query"}), 400
+
+    url = (
+        f"https://api.geoapify.com/v2/places?"
+        f"categories=healthcare.hospital&"
+        f"filter=circle:{lon},{lat},5000&"
+        f"limit=10&apiKey={GEOAPIFY_API_KEY}"
+    )
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return jsonify(data)
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(debug=True, host='0.0.0.0', port=8080)
