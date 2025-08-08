@@ -1,131 +1,111 @@
 # MediFinder
 
-**MediFinder** is a simple and handy web application that helps users find medical services quickly. It’s built with Python (Flask) and packed inside a Docker container so it can run easily anywhere — your laptop, a server, or in the cloud.
+MediFinder is a simple Flask web application that allows users to search for hospitals and pharmacies near a specified city. It uses the Geoapify API for geocoding city names and fetching places of interest.
 
 ---
 
-## What’s inside this project?
+## Features
 
-- `app/` — The main Python Flask app code and HTML templates  
-- `.env` — Environment configuration (like secrets, keys, ports)  
-- `requirements.txt` — Python packages the app needs  
-- `Dockerfile` — Instructions to create the Docker image  
-- `README.md` — This file, explaining how to use everything  
-- `venv/` — A Python virtual environment (not required if you use Docker)
+- Search by **city name** for hospitals or pharmacies.
+- Displays search results with names and addresses.
+- Responsive, modern frontend with loading spinner and error messages.
+- Simple backend built with Flask and Python.
 
 ---
 
-## Why use Docker?
+## Getting Started
 
-Docker packages your app and all its dependencies into one neat container. That means:
+### Prerequisites
 
-- No worries about installing Python or packages on your machine  
-- Runs the same way on any machine or server  
-- Makes deployment easier and consistent  
-
----
-
-## Quick Start: Run MediFinder locally with Docker
-
-You don’t need to install anything besides Docker!
-
-### Step 1: Clone the project
-
-Open your terminal or command prompt and run:
-
-```bash
-git clone https://github.com/Timothee-U/Medifinder.git
-cd Medifinder
-```
-
-### Step 2: Build the Docker image
-
-This step packages your app inside a Docker container:
-
-```bash
-docker build -t medifinder-app .
-```
-
-### Step 3: Run the Docker container
-
-Start the app with:
-
-```bash
-docker run -d -p 8080:8080 medifinder-app
-```
-
-- `-d` runs the container in the background  
-- `-p 8080:8080` maps your computer’s port 8080 to the app’s port 8080
-
-### Step 4: Open the app in your browser
-
-Go to: `http://localhost:8080` — you should see the MediFinder homepage!
+- Python 3.6 or higher installed on your system.
+- Git installed to clone the repository.
+- A Geoapify API key (free tier available) — sign up at [https://www.geoapify.com]
 
 ---
 
-## How to stop the app
+### Step 1: Clone the repository
 
-If you want to stop the running app container, run:
+Open PowerShell (or your terminal) and run:
 
-```bash
-docker stop $(docker ps -q)
-```
+```powershell
+git clone https://github.com/yourusername/medifinder.git
+cd medifinder
 
-This stops all running Docker containers.
+##Create a virtual environment by running 
 
----
+python -m venv venv
 
-## Environment variables
+##Activate the virtual environment:
 
-The `.env` file contains configuration like API keys or settings. You can customize it if needed. The Docker container reads this file when it starts.
+-On Windows PowerShell:
+.\venv\Scripts\Activate.ps1
 
----
+-On Windows CMD:
+venv\Scripts\activate.bat
 
-## Deploying MediFinder on multiple servers
+-On macOS/Linux:
+source venv/bin/activate
 
-For bigger setups, you can:
+##Install required Python packages:
 
-- Deploy the Docker container on multiple servers (like `web01`, `web02`)  
-- Use a load balancer (NGINX, HAProxy, or cloud-based) to distribute traffic evenly  
-- This improves reliability and can handle more users  
+pip install flask requests python-dotenv
 
----
 
-## What if you don’t want to use Docker?
+##Create a file named .env in the project root with your Geoapify API key:
 
-You can also run MediFinder directly if you have Python 3.11 installed:
+GEOAPIFY_API_KEY= your_actual_geoapify_api_key_here
 
-```bash
-python3 -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+##Start the Flask app by running:
+
 python app/app.py
-```
 
-Then open `http://localhost:8080`.
 
----
+###Open your browser and navigate to http://localhost:8080.
 
-## Troubleshooting tips
+Enter any city name (e.g., Kigali, London, etc).
 
-- If Docker commands don’t work, check if Docker Desktop is running  
-- Make sure port 8080 is free on your machine  
-- Check the logs with `docker logs <container_id>` if the app doesn’t start  
-- Make sure `.env` file exists and is configured properly  
+Choose either "Hospital" or "Pharmacy".
 
----
+Click Search.
 
-## Summary of useful commands
+View the results below the form with a loading spinner while fetching.
 
- Purpose                   Command                                          
- Clone project             `git clone https://github.com/Timothee-U/Medifinder.git` 
- Build Docker image        `docker build -t medifinder-app .`                
- Run Docker container      `docker run -d -p 8080:8080 medifinder-app`       
- Stop all Docker containers `docker stop $(docker ps -q)`                     
- Run app without Docker   See instructions above                             
+medifinder/
+├── app.py               # Flask backend application
+├── .env                 # Environment variables (API key)
+├── requirements.txt     # (Optional) Python dependencies list
+├── templates/
+│   └── index.html       # Frontend HTML template
+└── static/
+    ├── style.css        # Styling for frontend
+    └── script.js        # JavaScript for frontend logic
 
----
+NB: any additional file is to be disregarded as it was a result of tests.
 
-## Thanks for checking out MediFinder!
+##How it works
+The frontend sends a POST request with city and category to /search.
 
-This project was made to be simple to run and deploy, whether you’re just trying it locally or planning to run it on real servers. I am open to reviews and ideas how how make it a better project.
+The backend uses Geoapify Geocoding API to convert the city name to coordinates.
+
+Then it queries Geoapify Places API for hospitals or pharmacies near those coordinates.
+
+Results are returned as JSON to the frontend, which dynamically renders them.
+
+The frontend shows a loading spinner during the search and displays errors or no-results messages gracefully.
+
+###APIs Used
+Geoapify Geocoding API: Convert city names into latitude/longitude.
+
+Docs: https://apidocs.geoapify.com/docs/geocoding/
+
+Geoapify Places API: Search for places by category near coordinates.
+
+Docs: https://apidocs.geoapify.com/docs/places/
+
+
+###Challenges and How They Were Overcome
+Search by coordinates → Search by city name: Initially, the app required latitude and longitude inputs, which was not user-friendly. We integrated geocoding to let users simply input city names.
+
+Loading and feedback: Added a loading spinner during API requests to improve user experience.
+
+Error handling: Implemented clear error and no-results messages for smoother interaction.
