@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MediFinder</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <h1>MediFinder</h1>
-  <form id="searchForm">
-    <input type="text" id="lat" placeholder="Latitude" required>
-    <input type="text" id="lon" placeholder="Longitude" required>
-    <select id="category">
-      <option value="healthcare.hospital">Hospital</option>
-      <option value="healthcare.pharmacy">Pharmacy</option>
-    </select>
-    <button type="submit">Search</button>
-  </form>
-  <div id="results"></div>
+  <div class="container">
+    <header>
+      <h1>MediFinder</h1>
+      <p>Find hospitals and pharmacies near your city</p>
+    </header>
+
+    <form id="searchForm" autocomplete="off">
+      <input type="text" id="city" placeholder="Enter city name..." required />
+      <select id="category" aria-label="Select category">
+        <option value="healthcare.hospital">Hospital</option>
+        <option value="healthcare.pharmacy">Pharmacy</option>
+      </select>
+      <button type="submit">Search</button>
+    </form>
+
+    <div id="loading" class="loading-spinner" aria-live="polite" aria-atomic="true" hidden></div>
+
+    <section id="results" aria-live="polite" aria-atomic="true"></section>
+  </div>
+
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
